@@ -2,6 +2,10 @@
 
 Display system statistics in tmux status bar.
 
+# Change output format 
+
+    20.9% Mem, 4197/20040MB [|||||||   ] 78.3% 0.01 0.03 0.05
+
 ## Introduction
 
 tmux-sys-stat is still in early stage of development. It displays system statistics such as memory usage and cpus usage.
@@ -47,7 +51,7 @@ Add in .tmux.conf:
     set -g status-right "#[fg=black,bg=yellow]#(tmux-sys-stat)#[default] - #h %H:%M %d-%b-%y"
     set -g status-right-length 130
 
-## Output example
+## Output example(Deprecated)
 
     80.27% [#### ]73% [#    ]05% [##   ]36% [#    ]04% [###  ]44% [#    ]04% [#    ]20% [#    ]02%  - buddy 16:32 02-Jul-12
 
