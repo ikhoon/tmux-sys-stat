@@ -57,36 +57,41 @@ void StatusVisitor::visit(CpuReader* cpu) {
   const char *formatPercent         = "%02.0F%%";
   const char *formatPercentSpace    = "%02.0F%% ";
 
+  double totalUsed = 0.0;
+
   while (i--) {
     percentUsed = (cpu->statSystem(i) + cpu->statUser(i)) * 100.0;
-    nbBar = ceil(percentUsed / PERCENT_PER_BAR);
-    nbEmptyBar = NB_BAR_MAX - (int)nbBar;
-
-    cur = tmpOutput;
-    j = 0;
-
-    *cur++ = '[';
-    j = nbBar;
-    while (j--)   { *cur++ = '#'; }
-    j = nbEmptyBar;
-    while (j--)   { *cur++ = ' '; }
-    *cur++ = ']';
-
-    //sprintf(cur, (i) ? formatPercentSpace : formatPercent, percentUsed);
-
-    cpuStatus_ += tmpOutput;
+    totalUsed += percentUsed;
   }
+  
+  int scale = 2;
+  nbBar = ceil(totalUsed / (PERCENT_PER_BAR * scale));
+  nbEmptyBar = NB_BAR_MAX * scale - (int)nbBar;
+
+  cur = tmpOutput;
+  j = 0;
+  *cur++ = '[';
+  j = nbBar;
+  while (j--)   { *cur++ = '|'; }
+  j = nbEmptyBar;
+  while (j--)   { *cur++ = ' '; }
+  *cur++ = ']';
+  sprintf(cur, "%5.1F%%", totalUsed / cpu->cpuCount());
+  cpuStatus_ += tmpOutput;
+
 }
 
 void StatusVisitor::visit(MemReader* mem) {
   double percentMemUsed = (100.0 * (mem->totalMB()-mem->freeMB())) / mem->totalMB();
-  sprintf(tmpOutput, "%0.2F%% Mem", percentMemUsed);
+  int totalMB = mem->totalMB() / (1024 * 1024);
+  int freeMB = mem->freeMB() / (1024 * 1024);
+  sprintf(tmpOutput, "%0.1F%% Mem, %d/%dMB", percentMemUsed, freeMB, totalMB);
   memStatus_ += tmpOutput;
 }
 
 void StatusVisitor::visit(LoadAverageReader* lavg) {
-  sprintf(tmpOutput, "%0.2F %0.2F %0.2F", lavg->loadAverage1(), lavg->loadAverage5(), lavg->loadAverage15());
-  lavgStatus_ = tmpOutput;
+//  sprintf(tmpOutput, "%0.2F %0.2F %0.2F", lavg->loadAverage1(), lavg->loadAverage5(), lavg->loadAverage15());
+//  lavgStatus_ = tmpOutput;
 }
 
 
